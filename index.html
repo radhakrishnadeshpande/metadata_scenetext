@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metadata Form for Pages</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.min.css">
+    <style>
+        .row { margin-bottom: 30px; }
+        .image-container { display: flex; flex-direction: column; align-items: center; }
+        .form-container { padding: 15px; }
+        .image-preview { max-width: 100%; height: auto; margin: 10px 0; cursor: pointer; }
+        .image-name { text-align: center; margin-top: 5px; font-weight: bold; }
+        .pagination { display: flex; justify-content: center; margin-top: 20px; }
+        .pagination button { margin: 0 5px; padding: 10px 15px; border: 1px solid #ccc; background-color: #f8f9fa; cursor: pointer; }
+        .pagination button.active { background-color: #007bff; color: white; }
+        .custom-input { margin-top: 5px; }
+        .attribute-label { margin-top: 10px; font-weight: bold; }
+        .attribute-row { margin-bottom: 10px; }
+        table { width: 100%; }
+        th, td { padding: 10px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .image-cell, .attributes-cell { width: 50%; } /* Set width of each cell */
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="my-4 text-center">Metadata Form for Pages</h1>
+
+        <input type="file" id="imageUploadInput" accept=".zip,image/*" class="form-control mb-4" multiple>
+        <button class="btn btn-primary mb-4" onclick="downloadEditedCSV()">Download Metadata CSV</button>
+
+        <div id="container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Image</th>
+                        <th>Attributes</th>
+                    </tr>
+                </thead>
+                <tbody id="data-body"></tbody>
+            </table>
+        </div>
+
+        <div class="pagination">
+            <button onclick="previousPage()">Previous</button>
+            <div id="pagination-numbers"></div>
+            <button onclick="nextPage()">Next</button>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
+
+    <script>
+        const rowsPerPage = 100;
+        let currentPage = 1;
+        let totalPages = 0;
+        let imageFiles = [];
+        let csvData = [];
+
+        document.getElementById('imageUploadInput').addEventListener('change', async function (event) {
+            const files = Array.from(event.target.files);
+            csvData = [];
+
+            for (const file of files) {
+                if (file.type === 'application/zip') {
+                    await handleZipFile(file);
+                } else {
+                    imageFiles.push(file);
+                    csvData.push({ imageName: file.name, attributes: { language: [], sceneType: '', lighting: '', backgroundClutter: '', wordCount: '', textOcclusion: '', perspective: '', captureCondition: '', complexity: '', otherText: '' } });
+                }
+            }
+
+            totalPages = Math.ceil(csvData.length / rowsPerPage);
+            displayData();
+            renderPagination();
+        });
+
+        async function handleZipFile(zipFile) {
+            const JSZip = await import('https://cdn.jsdelivr.net/npm/jszip@3.7.1/dist/jszip.min.js');
+            const zip = await JSZip.loadAsync(zipFile);
+
+            for (const file of Object.values(zip.files)) {
+                if (!file.dir && file.name.match(/\.(jpg|jpeg|png|gif)$/i)) {
+                    const blob = await file.async('blob');
+                    const imageFile = new File([blob], file.name, { type: blob.type });
+                    imageFiles.push(imageFile);
+                    csvData.push({ imageName: file.name, attributes: { language: [], sceneType: '', lighting: '', backgroundClutter: '', wordCount: '', textOcclusion: '', perspective: '', captureCondition: '', complexity: '', otherText: '' } });
+                }
+            }
+        }
+
+        function displayData() {
+            const container = document.getElementById('data-body');
+            container.innerHTML = '';
+
+            const start = (currentPage - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+            const paginatedData = csvData.slice(start, end);
+
+            paginatedData.forEach((row, index) => {
+                const rowDiv = document.createElement('tr');
+
+                const imageContainer = document.createElement('td');
+                imageContainer.className = 'image-cell'; // Assign class for CSS
+                const img = document.createElement('img');
+                const file = imageFiles.find(f => f.name === row.imageName);
+                img.src = URL.createObjectURL(file);
+                img.alt = row.imageName;
+                img.className = 'image-preview';
+                img.onclick = () => window.open(img.src, '_blank');
+                img.style.width = '100%'; // Set a fixed width for thumbnails
+                imageContainer.appendChild(img);
+                rowDiv.appendChild(imageContainer);
+
+                const formContainer = document.createElement('td');
+                formContainer.className = 'attributes-cell'; // Assign class for CSS
+                formContainer.innerHTML = generateFormFields(start + index, row);
+                rowDiv.appendChild(formContainer);
+
+                container.appendChild(rowDiv);
+            });
+
+            $('.select-language').selectpicker();
+        }
+
+        function generateFormFields(index, row) {
+            return `
+                <div class="attribute-row">
+                    <label class="attribute-label">Language</label>
+                    <select class="select-language" multiple onchange="updateLanguage(${index}, this)">
+                        ${generateLanguageOptions(row.attributes.language)}
+                    </select>
+                </div>    
+                <div class="attribute-row">
+                    <label class="attribute-label">Scene Type</label>
+                    <div>
+                        <label><input type="radio" name="sceneType${index}" value="Outdoor" onchange="updateCSVData(${index}, 'sceneType', this.value)"> Outdoor</label>
+                        <label><input type="radio" name="sceneType${index}" value="Indoor" onchange="updateCSVData(${index}, 'sceneType', this.value)"> Indoor</label>
+                        <label><input type="radio" name="sceneType${index}" value="Signboard" onchange="updateCSVData(${index}, 'sceneType', this.value)"> Signboard</label>
+                        <label><input type="radio" name="sceneType${index}" value="Natural Scene" onchange="updateCSVData(${index}, 'sceneType', this.value)"> Natural Scene</label>
+                        <label><input type="radio" name="sceneType${index}" value="Other" onchange="showOtherInput(${index}, 'sceneType')"> Other</label>
+                    </div>
+                    <input type="text" id="otherSceneType${index}" class="custom-input" placeholder="Specify other..." oninput="updateCSVData(${index}, 'otherText', this.value)" style="display:none;">
+                </div>
+                <div class="attribute-row">
+                    <label class="attribute-label">Lighting Conditions</label>
+                    <div>
+                        <label><input type="radio" name="lighting${index}" value="Bright" onchange="updateCSVData(${index}, 'lighting', this.value)"> Bright</label>
+                        <label><input type="radio" name="lighting${index}" value="Dim" onchange="updateCSVData(${index}, 'lighting', this.value)"> Dim</label>
+                        <label><input type="radio" name="lighting${index}" value="Natural" onchange="updateCSVData(${index}, 'lighting', this.value)"> Natural</label>
+                        <label><input type="radio" name="lighting${index}" value="Foggy/Rainy" onchange="updateCSVData(${index}, 'lighting', this.value)"> Foggy/Rainy</label>
+                        <label><input type="radio" name="lighting${index}" value="Artificial" onchange="updateCSVData(${index}, 'lighting', this.value)"> Artificial</label>
+                        <label><input type="radio" name="lighting${index}" value="Other" onchange="showOtherInput(${index}, 'lighting')"> Other</label>
+                    </div>
+                    <input type="text" id="otherLighting${index}" class="custom-input" placeholder="Specify other..." oninput="updateCSVData(${index}, 'otherText', this.value)" style="display:none;">
+                </div>
+                <div class="attribute-row">
+                    <label class="attribute-label">Background Clutter</label>
+                    <div>
+                        <label><input type="radio" name="backgroundClutter${index}" value="High" onchange="updateCSVData(${index}, 'backgroundClutter', this.value)"> High</label>
+                        <label><input type="radio" name="backgroundClutter${index}" value="Medium" onchange="updateCSVData(${index}, 'backgroundClutter', this.value)"> Medium</label>
+                        <label><input type="radio" name="backgroundClutter${index}" value="Low" onchange="updateCSVData(${index}, 'backgroundClutter', this.value)"> Low</label>
+                        <label><input type="radio" name="backgroundClutter${index}" value="None" onchange="updateCSVData(${index}, 'backgroundClutter', this.value)"> None</label>
+                    </div>
+                </div>
+                <div class="attribute-row">
+                    <label class="attribute-label">Word Count</label>
+                    <input type="number" class="custom-input" oninput="updateCSVData(${index}, 'wordCount', this.value)">
+                </div>
+                <div class="attribute-row">
+                    <label class="attribute-label">Text Occlusion</label>
+                    <select class="custom-input" onchange="updateCSVData(${index}, 'textOcclusion', this.value)">
+                        <option value="None">None</option>
+                        <option value="Partial">Partial</option>
+                        <option value="Full">Full</option>
+                    </select>
+                </div>
+                <div class="attribute-row">
+                    <label class="attribute-label">Perspective</label>
+                    <select class="custom-input" onchange="updateCSVData(${index}, 'perspective', this.value)">
+                        <option value="Eye Level">Eye Level</option>
+                        <option value="Above">Above</option>
+                        <option value="Below">Below</option>
+                    </select>
+                </div>
+                <div class="attribute-row">
+                    <label class="attribute-label">Capture Condition</label>
+                    <select class="custom-input" onchange="updateCSVData(${index}, 'captureCondition', this.value)">
+                        <option value="Snapshot">Snapshot</option>
+                        <option value="Scanned">Scanned</option>
+                    </select>
+                </div>
+                <div class="attribute-row">
+                    <label class="attribute-label">Overall Complexity (1 to 5)</label>
+                    <input type="number" min="1" max="5" class="custom-input" oninput="updateCSVData(${index}, 'complexity', this.value)">
+                </div>
+            `;
+        }
+
+        function generateLanguageOptions(selectedLanguages) {
+            const languages = ['Assamese', 'Bengali', 'English', 'Gujarati', 'Hindi', 'Marathi', 'Manipuri', 'Malayalam', 'Punjabi', 'Oriya', 'Kannada', 'Telugu', 'Tamil', 'Urdu', 'Bodo', 'Dogri', 'Kashmiri', 'Konkani', 'Maithili', 'Nepali', 'Sanskrit', 'Santali', 'Sindhi', 'None'];
+            return languages.map(lang => `<option value="${lang}" ${selectedLanguages.includes(lang) ? 'selected' : ''}>${lang}</option>`).join('');
+        }
+
+        function updateLanguage(index, selectElement) {
+            const selectedLanguages = Array.from(selectElement.selectedOptions).map(option => option.value);
+            csvData[index].attributes.language = selectedLanguages;
+        }
+
+        function updateCSVData(index, key, value) {
+            csvData[index].attributes[key] = value;
+        }
+
+        function showOtherInput(index, type) {
+            const otherInput = document.getElementById(`other${type.charAt(0).toUpperCase() + type.slice(1)}${index}`);
+            otherInput.style.display = 'block';
+        }
+
+        function previousPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                displayData();
+                renderPagination();
+            }
+        }
+
+        function nextPage() {
+            if (currentPage < totalPages) {
+                currentPage++;
+                displayData();
+                renderPagination();
+            }
+        }
+
+        function renderPagination() {
+            const paginationNumbers = document.getElementById('pagination-numbers');
+            paginationNumbers.innerHTML = '';
+
+            for (let i = 1; i <= totalPages; i++) {
+                const pageButton = document.createElement('button');
+                pageButton.textContent = i;
+                pageButton.className = (i === currentPage) ? 'active' : '';
+                pageButton.onclick = () => {
+                    currentPage = i;
+                    displayData();
+                    renderPagination();
+                };
+                paginationNumbers.appendChild(pageButton);
+            }
+        }
+
+        function downloadEditedCSV() {
+            const csvContent = `data:text/csv;charset=utf-8,Image Name,Language,Graphics,Tables,Equations,Watermark,Handwritten,Columns,Colored Text,Foreground Color,Background Color,Text Quality\n` +
+                csvData.map(row => {
+                    const { imageName, attributes } = row;
+                    const language = attributes.language.join('; ');
+                    const { sceneType, lighting, backgroundClutter, wordCount, textOcclusion, perspective, captureCondition, complexity } = attributes;
+                    return `${imageName},"${language}","${sceneType}","${lighting}","${backgroundClutter}","${wordCount}","${textOcclusion}","${perspective}","${captureCondition}","${complexity}"`;
+                }).join('\n');
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement('a');
+            link.setAttribute('href', encodedUri);
+            link.setAttribute('download', 'metadata.csv');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>
