@@ -255,7 +255,7 @@
         }
 
         function downloadEditedCSV() {
-            const csvContent = `data:text/csv;charset=utf-8,Image Name,Language,Graphics,Tables,Equations,Watermark,Handwritten,Columns,Colored Text,Foreground Color,Background Color,Text Quality\n` +
+            const csvContent = `data:text/csv;charset=utf-8,Image Name,Language,SceneType,Lighting,BackgroundClutter,WordCount,TextOcclusion,Perspective,CaptureCondition,Complexity\n` +
                 csvData.map(row => {
                     const { imageName, attributes } = row;
                     const language = attributes.language.join('; ');
