@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Metadata Form for Pages</title>
+    <title>Metadata Form for SceneText</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.min.css">
     <style>
@@ -26,7 +26,7 @@
 </head>
 <body>
     <div class="container">
-        <h1 class="my-4 text-center">Metadata Form for Pages</h1>
+        <h1 class="my-4 text-center">Metadata Form for SceneText</h1>
 
         <input type="file" id="imageUploadInput" accept=".zip,image/*" class="form-control mb-4" multiple>
         <button class="btn btn-primary mb-4" onclick="downloadEditedCSV()">Download Metadata CSV</button>
@@ -145,66 +145,86 @@
                         <label><input type="radio" name="sceneType${index}" value="Natural Scene" onchange="updateCSVData(${index}, 'sceneType', this.value)"> Natural Scene</label>
                         <label><input type="radio" name="sceneType${index}" value="Other" onchange="showOtherInput(${index}, 'sceneType')"> Other</label>
                     </div>
-                    <input type="text" id="otherSceneType${index}" class="custom-input" placeholder="Specify other..." oninput="updateCSVData(${index}, 'otherText', this.value)" style="display:none;">
+                    <input type="text" id="otherSceneType${index}" class="custom-input" placeholder="Specify other..." oninput="updateCSVData(${index}, 'sceneType', this.value)" style="display:none;">
                 </div>
                 <div class="attribute-row">
-                    <label class="attribute-label">Lighting Conditions</label>
+                    <label class="attribute-label">Lighting</label>
                     <div>
-                        <label><input type="radio" name="lighting${index}" value="Bright" onchange="updateCSVData(${index}, 'lighting', this.value)"> Bright</label>
-                        <label><input type="radio" name="lighting${index}" value="Dim" onchange="updateCSVData(${index}, 'lighting', this.value)"> Dim</label>
                         <label><input type="radio" name="lighting${index}" value="Natural" onchange="updateCSVData(${index}, 'lighting', this.value)"> Natural</label>
-                        <label><input type="radio" name="lighting${index}" value="Foggy/Rainy" onchange="updateCSVData(${index}, 'lighting', this.value)"> Foggy/Rainy</label>
                         <label><input type="radio" name="lighting${index}" value="Artificial" onchange="updateCSVData(${index}, 'lighting', this.value)"> Artificial</label>
+                        <label><input type="radio" name="lighting${index}" value="Mixed" onchange="updateCSVData(${index}, 'lighting', this.value)"> Mixed</label>
                         <label><input type="radio" name="lighting${index}" value="Other" onchange="showOtherInput(${index}, 'lighting')"> Other</label>
                     </div>
-                    <input type="text" id="otherLighting${index}" class="custom-input" placeholder="Specify other..." oninput="updateCSVData(${index}, 'otherText', this.value)" style="display:none;">
+                    <input type="text" id="otherLighting${index}" class="custom-input" placeholder="Specify other..." oninput="updateCSVData(${index}, 'lighting', this.value)" style="display:none;">
                 </div>
                 <div class="attribute-row">
                     <label class="attribute-label">Background Clutter</label>
                     <div>
-                        <label><input type="radio" name="backgroundClutter${index}" value="High" onchange="updateCSVData(${index}, 'backgroundClutter', this.value)"> High</label>
-                        <label><input type="radio" name="backgroundClutter${index}" value="Medium" onchange="updateCSVData(${index}, 'backgroundClutter', this.value)"> Medium</label>
-                        <label><input type="radio" name="backgroundClutter${index}" value="Low" onchange="updateCSVData(${index}, 'backgroundClutter', this.value)"> Low</label>
                         <label><input type="radio" name="backgroundClutter${index}" value="None" onchange="updateCSVData(${index}, 'backgroundClutter', this.value)"> None</label>
+                        <label><input type="radio" name="backgroundClutter${index}" value="Minimal" onchange="updateCSVData(${index}, 'backgroundClutter', this.value)"> Minimal</label>
+                        <label><input type="radio" name="backgroundClutter${index}" value="Moderate" onchange="updateCSVData(${index}, 'backgroundClutter', this.value)"> Moderate</label>
+                        <label><input type="radio" name="backgroundClutter${index}" value="High" onchange="updateCSVData(${index}, 'backgroundClutter', this.value)"> High</label>
+                        <label><input type="radio" name="backgroundClutter${index}" value="Other" onchange="showOtherInput(${index}, 'backgroundClutter')"> Other</label>
                     </div>
+                    <input type="text" id="otherBackgroundClutter${index}" class="custom-input" placeholder="Specify other..." oninput="updateCSVData(${index}, 'backgroundClutter', this.value)" style="display:none;">
                 </div>
                 <div class="attribute-row">
                     <label class="attribute-label">Word Count</label>
-                    <input type="number" class="custom-input" oninput="updateCSVData(${index}, 'wordCount', this.value)">
-                </div>
+                    <div>
+                        <label><input type="radio" name="wordCount${index}" value="0" onchange="updateCSVData(${index}, 'wordCount', this.value)"> 0</label>
+                        <label><input type="radio" name="wordCount${index}" value="1-5" onchange="updateCSVData(${index}, 'wordCount', this.value)"> 1-5</label>
+                        <label><input type="radio" name="wordCount${index}" value="5-10" onchange="updateCSVData(${index}, 'wordCount', this.value)"> 5-10</label>
+                        <label><input type="radio" name="wordCount${index}" value="10-20" onchange="updateCSVData(${index}, 'wordCount', this.value)"> 10-20</label>
+                        <label><input type="radio" name="wordCount${index}" value=">20" onchange="updateCSVData(${index}, 'wordCount', this.value)"> >20</label>
+                        <label><input type="radio" name="wordCount${index}" value="Other" onchange="showOtherInput(${index}, 'wordCount')"> Other</label>
+                    </div>
+                    <input type="text" id="otherWordCount${index}" class="custom-input" placeholder="Specify other..." oninput="updateCSVData(${index}, 'wordCount', this.value)" style="display:none;">
+                                </div>
                 <div class="attribute-row">
                     <label class="attribute-label">Text Occlusion</label>
-                    <select class="custom-input" onchange="updateCSVData(${index}, 'textOcclusion', this.value)">
-                        <option value="None">None</option>
-                        <option value="Partial">Partial</option>
-                        <option value="Full">Full</option>
-                    </select>
+                    <div>
+                        <label><input type="radio" name="textOcclusion${index}" value="None" onchange="updateCSVData(${index}, 'textOcclusion', this.value)"> None</label>
+                        <label><input type="radio" name="textOcclusion${index}" value="Partial" onchange="updateCSVData(${index}, 'textOcclusion', this.value)"> Partial</label>
+                        <label><input type="radio" name="textOcclusion${index}" value="Complete" onchange="updateCSVData(${index}, 'textOcclusion', this.value)"> Complete</label>
+                        <label><input type="radio" name="textOcclusion${index}" value="Other" onchange="showOtherInput(${index}, 'textOcclusion')"> Other</label>
+                    </div>
+                    <input type="text" id="otherTextOcclusion${index}" class="custom-input" placeholder="Specify other..." oninput="updateCSVData(${index}, 'textOcclusion', this.value)" style="display:none;">
                 </div>
                 <div class="attribute-row">
                     <label class="attribute-label">Perspective</label>
-                    <select class="custom-input" onchange="updateCSVData(${index}, 'perspective', this.value)">
-                        <option value="Eye Level">Eye Level</option>
-                        <option value="Above">Above</option>
-                        <option value="Below">Below</option>
-                    </select>
+                    <div>
+                        <label><input type="radio" name="perspective${index}" value="Straight" onchange="updateCSVData(${index}, 'perspective', this.value)"> Straight</label>
+                        <label><input type="radio" name="perspective${index}" value="Angled" onchange="updateCSVData(${index}, 'perspective', this.value)"> Angled</label>
+                        <label><input type="radio" name="perspective${index}" value="Other" onchange="showOtherInput(${index}, 'perspective')"> Other</label>
+                    </div>
+                    <input type="text" id="otherPerspective${index}" class="custom-input" placeholder="Specify other..." oninput="updateCSVData(${index}, 'perspective', this.value)" style="display:none;">
                 </div>
                 <div class="attribute-row">
                     <label class="attribute-label">Capture Condition</label>
-                    <select class="custom-input" onchange="updateCSVData(${index}, 'captureCondition', this.value)">
-                        <option value="Snapshot">Snapshot</option>
-                        <option value="Scanned">Scanned</option>
-                    </select>
+                    <div>
+                        <label><input type="radio" name="captureCondition${index}" value="Single Shot" onchange="updateCSVData(${index}, 'captureCondition', this.value)"> Single Shot</label>
+                        <label><input type="radio" name="captureCondition${index}" value="Burst" onchange="updateCSVData(${index}, 'captureCondition', this.value)"> Burst</label>
+                        <label><input type="radio" name="captureCondition${index}" value="Other" onchange="showOtherInput(${index}, 'captureCondition')"> Other</label>
+                    </div>
+                    <input type="text" id="otherCaptureCondition${index}" class="custom-input" placeholder="Specify other..." oninput="updateCSVData(${index}, 'captureCondition', this.value)" style="display:none;">
                 </div>
                 <div class="attribute-row">
-                    <label class="attribute-label">Overall Complexity (1 to 5)</label>
-                    <input type="number" min="1" max="5" class="custom-input" oninput="updateCSVData(${index}, 'complexity', this.value)">
+                    <label class="attribute-label">Overall Complexity (1-5)</label>
+                    <input type="number" min="1" max="5" oninput="updateCSVData(${index}, 'complexity', this.value)">
+                </div>
+                <div class="attribute-row">
+                    <label class="attribute-label">Other Text</label>
+                    <input type="text" oninput="updateCSVData(${index}, 'otherText', this.value)">
                 </div>
             `;
         }
 
         function generateLanguageOptions(selectedLanguages) {
-            const languages = ['Assamese', 'Bengali', 'English', 'Gujarati', 'Hindi', 'Marathi', 'Manipuri', 'Malayalam', 'Punjabi', 'Oriya', 'Kannada', 'Telugu', 'Tamil', 'Urdu', 'Bodo', 'Dogri', 'Kashmiri', 'Konkani', 'Maithili', 'Nepali', 'Sanskrit', 'Santali', 'Sindhi', 'None'];
-            return languages.map(lang => `<option value="${lang}" ${selectedLanguages.includes(lang) ? 'selected' : ''}>${lang}</option>`).join('');
+            const languages = ["English", "Spanish", "French", "German", "Chinese", "Japanese", "Other"];
+            return languages.map(lang => {
+                const isSelected = selectedLanguages.includes(lang) ? 'selected' : '';
+                return `<option value="${lang}" ${isSelected}>${lang}</option>`;
+            }).join('');
         }
 
         function updateLanguage(index, selectElement) {
@@ -212,53 +232,23 @@
             csvData[index].attributes.language = selectedLanguages;
         }
 
-        function updateCSVData(index, key, value) {
-            csvData[index].attributes[key] = value;
+        function showOtherInput(index, attribute) {
+            document.getElementById(`other${capitalizeFirstLetter(attribute)}${index}`).style.display = 'block';
         }
 
-        function showOtherInput(index, type) {
-            const otherInput = document.getElementById(`other${type.charAt(0).toUpperCase() + type.slice(1)}${index}`);
-            otherInput.style.display = 'block';
+        function hideOtherInput(index, attribute) {
+            document.getElementById(`other${capitalizeFirstLetter(attribute)}${index}`).style.display = 'none';
         }
 
-        function previousPage() {
-            if (currentPage > 1) {
-                currentPage--;
-                displayData();
-                renderPagination();
-            }
-        }
-
-        function nextPage() {
-            if (currentPage < totalPages) {
-                currentPage++;
-                displayData();
-                renderPagination();
-            }
-        }
-
-        function renderPagination() {
-            const paginationNumbers = document.getElementById('pagination-numbers');
-            paginationNumbers.innerHTML = '';
-
-            for (let i = 1; i <= totalPages; i++) {
-                const pageButton = document.createElement('button');
-                pageButton.textContent = i;
-                pageButton.className = (i === currentPage) ? 'active' : '';
-                pageButton.onclick = () => {
-                    currentPage = i;
-                    displayData();
-                    renderPagination();
-                };
-                paginationNumbers.appendChild(pageButton);
-            }
+        function updateCSVData(index, attribute, value) {
+            csvData[index].attributes[attribute] = value;
         }
 
         function downloadEditedCSV() {
             const csvContent = `data:text/csv;charset=utf-8,Image Name,Language,SceneType,Lighting,BackgroundClutter,WordCount,TextOcclusion,Perspective,CaptureCondition,Complexity\n` +
                 csvData.map(row => {
                     const { imageName, attributes } = row;
-                    const language = attributes.language.join('; ');
+                    const language = attributes.language.join('; '); // Join languages with semicolon
                     const { sceneType, lighting, backgroundClutter, wordCount, textOcclusion, perspective, captureCondition, complexity } = attributes;
                     return `${imageName},"${language}","${sceneType}","${lighting}","${backgroundClutter}","${wordCount}","${textOcclusion}","${perspective}","${captureCondition}","${complexity}"`;
                 }).join('\n');
@@ -270,6 +260,43 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+        }
+
+        function renderPagination() {
+            const paginationNumbers = document.getElementById('pagination-numbers');
+            paginationNumbers.innerHTML = '';
+
+            for (let i = 1; i <= totalPages; i++) {
+                const button = document.createElement('button');
+                button.textContent = i;
+                button.onclick = () => goToPage(i);
+                if (i === currentPage) {
+                    button.classList.add('active');
+                }
+                paginationNumbers.appendChild(button);
+            }
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            displayData();
+            renderPagination();
+        }
+
+        function previousPage() {
+            if (currentPage > 1) {
+                goToPage(currentPage - 1);
+            }
+        }
+
+        function nextPage() {
+            if (currentPage < totalPages) {
+                goToPage(currentPage + 1);
+            }
+        }
+
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
         }
     </script>
 </body>
