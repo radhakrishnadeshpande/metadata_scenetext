@@ -220,7 +220,7 @@
         }
 
         function generateLanguageOptions(selectedLanguages) {
-            const languages = ["English", "Spanish", "French", "German", "Chinese", "Japanese", "Other"];
+            const languages = ['Assamese', 'Bengali', 'English', 'Gujarati', 'Hindi', 'Marathi', 'Manipuri', 'Malayalam', 'Punjabi', 'Oriya', 'Kannada', 'Telugu', 'Tamil', 'Urdu', 'Bodo', 'Dogri', 'Kashmiri', 'Konkani', 'Maithili', 'Nepali', 'Sanskrit', 'Santali', 'Sindhi', 'None'];
             return languages.map(lang => {
                 const isSelected = selectedLanguages.includes(lang) ? 'selected' : '';
                 return `<option value="${lang}" ${isSelected}>${lang}</option>`;
