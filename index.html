@@ -160,10 +160,9 @@
                 <div class="attribute-row">
                     <label class="attribute-label">Background Clutter</label>
                     <div>
-                        <label><input type="radio" name="backgroundClutter${index}" value="None" onchange="updateCSVData(${index}, 'backgroundClutter', this.value)"> None</label>
-                        <label><input type="radio" name="backgroundClutter${index}" value="Minimal" onchange="updateCSVData(${index}, 'backgroundClutter', this.value)"> Minimal</label>
-                        <label><input type="radio" name="backgroundClutter${index}" value="Moderate" onchange="updateCSVData(${index}, 'backgroundClutter', this.value)"> Moderate</label>
-                        <label><input type="radio" name="backgroundClutter${index}" value="High" onchange="updateCSVData(${index}, 'backgroundClutter', this.value)"> High</label>
+                        <label><input type="radio" name="backgroundClutter${index}" value="Busy" onchange="updateCSVData(${index}, 'backgroundClutter', this.value)"> Busy</label>
+                        <label><input type="radio" name="backgroundClutter${index}" value="Simple" onchange="updateCSVData(${index}, 'backgroundClutter', this.value)"> Simple</label>
+                        <label><input type="radio" name="backgroundClutter${index}" value="No Background" onchange="updateCSVData(${index}, 'backgroundClutter', this.value)"> No Background</label>
                         <label><input type="radio" name="backgroundClutter${index}" value="Other" onchange="showOtherInput(${index}, 'backgroundClutter')"> Other</label>
                     </div>
                     <input type="text" id="otherBackgroundClutter${index}" class="custom-input" placeholder="Specify other..." oninput="updateCSVData(${index}, 'backgroundClutter', this.value)" style="display:none;">
