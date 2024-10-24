@@ -135,7 +135,18 @@
                     <select class="select-language" multiple onchange="updateLanguage(${index}, this)">
                         ${generateLanguageOptions(row.attributes.language)}
                     </select>
-                </div>    
+                </div>
+                
+                <div class="attribute-row">
+                    <label class="attribute-label">Where the image is uploaded? </label>
+                    <div>
+                        <label class="radio-inline"><input type="radio" name="whereimageuploaded${index}" value="Dev" onchange="updateCSVData(${index}, 'whereimageuploaded', 'Dev')"> Dev</label>
+                        <label class="radio-inline"><input type="radio" name="whereimageuploaded${index}" value="Test" onchange="updateCSVData(${index}, 'whereimageuploaded', 'Test')">Test</label>
+                        <label class="radio-inline"><input type="radio" name="whereimageuploaded${index}" value="Other" onchange="showCustomInput(${index}, 'whereimageuploaded')"> Other</label>
+                        <input type="text" id="customWhereimageuploaded${index}" class="custom-input" placeholder="Specify other" onblur="updateCustomValue(${index}, 'whereimageuploaded', this.value)">
+                    </div>
+                </div>
+
                 <div class="attribute-row">
                     <label class="attribute-label">Scene Type</label>
                     <div>
@@ -173,9 +184,9 @@
                     <label class="attribute-label">Word Count</label>
                     <div>
                         <label><input type="radio" name="wordCount${index}" value="0" onchange="updateCSVData(${index}, 'wordCount', this.value)"> 0</label>
-                        <label><input type="radio" name="wordCount${index}" value="1-5" onchange="updateCSVData(${index}, 'wordCount', this.value)"> 1-5</label>
-                        <label><input type="radio" name="wordCount${index}" value="5-10" onchange="updateCSVData(${index}, 'wordCount', this.value)"> 5-10</label>
-                        <label><input type="radio" name="wordCount${index}" value="10-20" onchange="updateCSVData(${index}, 'wordCount', this.value)"> 10-20</label>
+                        <label><input type="radio" name="wordCount${index}" value="1_5" onchange="updateCSVData(${index}, 'wordCount', this.value)"> 1_5</label>
+                        <label><input type="radio" name="wordCount${index}" value="5_10" onchange="updateCSVData(${index}, 'wordCount', this.value)"> 5_10</label>
+                        <label><input type="radio" name="wordCount${index}" value="10_20" onchange="updateCSVData(${index}, 'wordCount', this.value)"> 10_20</label>
                         <label><input type="radio" name="wordCount${index}" value=">20" onchange="updateCSVData(${index}, 'wordCount', this.value)"> >20</label>
                         <label><input type="radio" name="wordCount${index}" value="Other" onchange="showOtherInput(${index}, 'wordCount')"> Other</label>
                     </div>
@@ -247,12 +258,29 @@
         }
 
         function downloadEditedCSV() {
-            const csvContent = `data:text/csv;charset=utf-8,Image Name,Language,SceneType,Lighting,BackgroundClutter,WordCount,TextOcclusion,Perspective,CaptureCondition,Complexity\n` +
+            const csvContent = `data:text/csv;charset=utf-8,Page ID,Where Image Uploaded,Language,SceneType,Lighting,BackgroundClutter,WordCount,TextOcclusion,Perspective,CaptureCondition,Complexity,Page Link\n` +
                 csvData.map(row => {
                     const { imageName, attributes } = row;
+                    const baseImageName = imageName.replace(/\.[^/.]+$/, "");
+                    
+                    if (!attributes.whereimageuploaded) {
+                        attributes.whereimageuploaded = 'Dev';
+                    }
+
+                    const whereimageuploaded = attributes.whereimageuploaded; // Fixed here
+
+                    let pageLink;
+                    if (whereimageuploaded === 'Test') {
+                        pageLink = `https://ilocr.iiit.ac.in/ocr_testing/upload/${baseImageName}/`;
+                    } else if (whereimageuploaded === 'Dev') {
+                        pageLink = `http://10.4.16.36:8000/ocr_testing/page_detail/${baseImageName}/`;
+                    } else {
+                        pageLink = whereimageuploaded || '';
+                    }
+
                     const language = attributes.language.join('; '); // Join languages with semicolon
                     const { sceneType, lighting, backgroundClutter, wordCount, textOcclusion, perspective, captureCondition, complexity } = attributes;
-                    return `${imageName},"${language}","${sceneType}","${lighting}","${backgroundClutter}","${wordCount}","${textOcclusion}","${perspective}","${captureCondition}","${complexity}"`;
+                    return `${baseImageName},${whereimageuploaded},${language},${sceneType},${lighting},${backgroundClutter},${wordCount},${textOcclusion},${perspective},${captureCondition},${complexity},${pageLink}`;
                 }).join('\n');
 
             const encodedUri = encodeURI(csvContent);
@@ -263,6 +291,7 @@
             link.click();
             document.body.removeChild(link);
         }
+
 
         function renderPagination() {
             const paginationNumbers = document.getElementById('pagination-numbers');
